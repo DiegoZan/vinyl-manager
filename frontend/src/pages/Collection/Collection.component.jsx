@@ -61,7 +61,7 @@ export default function CollectionView({
 
 			<Grid container spacing={2}>
 				{items.map((item) => (
-					<Grid key={item.collectionItemId} item xs={12} sm={6} md={4} lg={3}>
+					<Grid key={item.collectionItemId} item size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
 						<ReleaseCard item={item} />
 					</Grid>
 				))}

@@ -136,6 +136,11 @@ export default function ReleaseDetailsView({
 																.filter(Boolean)
 																.join(" • ") || "—"}
 														</Typography>
+														{ci.notes ? (
+															<Typography variant="body2" sx={{ mt: 0.5 }} style={{ whiteSpace: "pre-wrap" }}>
+																<strong>Notes:</strong> {ci.notes}
+															</Typography>
+														) : null}
 
 														{saveError && (
 															<Typography variant="caption" color="error">
@@ -195,12 +200,23 @@ export default function ReleaseDetailsView({
 							No tracklist available.
 						</Typography>
 					) : (
-						<List dense>
-							{tracks.map((t) => {
-								const primary = (t.position ? `${t.position} ` : "") + t.title;
+						<List dense disablePadding>
+							{tracks.map((t, idx) => {
+								const positionPrefix = t.position ? `${t.position} ` : "";
 								return (
-									<ListItem key={t.id} disablePadding>
-										<ListItemText primary={primary} secondary={t.duration || undefined} />
+									<ListItem
+										key={t.id}
+										disablePadding
+										sx={{
+											px: 1,
+											py: 0.5,
+											borderRadius: 1,
+											...(idx % 2 === 1
+												? { backgroundColor: "action.hover" } // sombreado suave
+												: null),
+										}}
+									>
+										<ListItemText primary={`${positionPrefix}${t.title}`} secondary={t.duration || undefined} />
 									</ListItem>
 								);
 							})}

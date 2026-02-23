@@ -21,7 +21,7 @@ export default function ReleaseCard({ item }) {
 						</Typography>
 
 						<Stack direction="row" spacing={1} flexWrap="wrap">
-							<Chip size="small" label={item.status} />
+							<Chip size="small" label={item.status} color={item.status === "active" ? "success" : "error"} />
 						</Stack>
 					</Stack>
 				</CardContent>

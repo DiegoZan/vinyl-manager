@@ -8,7 +8,7 @@ export default function CollectionContainer() {
 	const navigate = useNavigate();
 
 	const [q, setQ] = useState("");
-	const [status, setStatus] = useState("");
+	const [status, setStatus] = useState("active");
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
 	const [items, setItems] = useState([]);
