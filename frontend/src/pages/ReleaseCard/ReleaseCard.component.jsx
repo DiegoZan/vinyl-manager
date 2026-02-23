@@ -9,7 +9,7 @@ export default function ReleaseCard({ item }) {
 	return (
 		<Card>
 			<CardActionArea onClick={() => navigate(`/releases/${item.releaseId}`)}>
-				<CardMedia component="img" height="220" image={cover} alt={`${item.title} cover`} />
+				<CardMedia component="img" height="280" image={cover} alt={`${item.title} cover`} />
 				<CardContent>
 					<Stack spacing={1}>
 						<Typography variant="subtitle1" fontWeight={600} noWrap title={item.title}>
