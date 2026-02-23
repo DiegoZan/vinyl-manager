@@ -268,3 +268,130 @@ vinyl-manager/
 - SQLite
 - Nginx
 - Discogs API
+
+---
+
+## 9. Ejecutando la aplicación
+
+El proyecto está compuesto de dos aplicaciones separadas:
+
+- `frontend/` → React (Vite)
+- `backend/` → Node.js + Express + SQLite
+
+Cada aplicación se despliega y ejecuta independientemente.
+
+### 1️⃣ Backend
+
+#### Instalar dependencias
+
+```bash
+cd backend
+npm install
+```
+
+#### Ejecutar en modo desarrollo
+
+```bash
+npm run dev
+```
+
+El backend iniciará en `http://localhos:3000`.
+
+Endpoint de prueba: `GET /api/health`.
+
+#### Ejecutar en modo producción
+
+```bash
+npm start
+```
+
+#### Ejecutar tests
+
+```
+cd backend
+npm test
+```
+
+### 2️⃣ Frontend
+
+#### Instalar dependencias
+
+```bash
+cd frontend
+npm install
+```
+
+#### Ejecutar en modo desarrollo
+
+```bash
+npm run dev
+```
+
+La aplicación iniciará en `http://localhos:5173`.
+
+#### Ejecutar tests
+
+```
+cd frontend
+npm test
+```
+
+#### Build para producción
+
+```bash
+npm build
+```
+
+---
+
+## 9. Documentación de la API
+
+El proyecto utiliza una integración con la API de Discogs.
+
+La documentación oficial está disponible en: https://www.discogs.com/developers
+
+---
+
+## 10. Deployment (VPS + Nginx)
+
+Esta aplicación está diseñada para ser desplegada en un VPS utilizando Nginx como reverse proxy.
+
+### Production Architecture
+
+- Nginx serves the React static build.
+- Nginx proxies `/api` requests to the Node.js backend.
+- SQLite runs locally as a file-based database.
+- Backend runs as a Node.js process (e.g., via PM2 or systemd).
+
+---
+
+## 1️⃣ Frontend
+
+```bash
+cd frontend
+npm install
+npm run build
+```
+
+El código de producción se generará en `frontend/dist`. El contenido de esta carpeta se debe copiar a la carpeta raiz de Nginx, por ejemplo en `/var/www/vinyl-manager`.
+
+## 2️⃣ Backend
+
+En el VPS:
+
+```
+cd backend
+npm install
+```
+
+Crear un archivo de entorno para producción:
+
+```
+PORT=3000
+DATABASE_PATH=/var/www/vinyl-manager/data/vinyl.db
+
+DISCOGS_KEY=your_discogs_key
+DISCOGS_SECRET=your_discogs_secret
+```
+
+Iniciar el backend con `npm start`.

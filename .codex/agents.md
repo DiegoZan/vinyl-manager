@@ -115,6 +115,8 @@ Authorization: Discogs key=YOUR_KEY, secret=YOUR_SECRET
 
 All Discogs requests must go through the backend service layer.
 
+Discogs API documentation available at: https://www.discogs.com/developers
+
 ---
 
 ### Environment Variables
@@ -168,6 +170,10 @@ At minimum, README updates should cover:
 - New setup steps
 - New scripts (dev/build/test)
 - Any changes in architecture or deployment
+
+### Important note
+
+- Readme.md is the only file that MUST BE mainteined in SPANISH
 
 ---
 
