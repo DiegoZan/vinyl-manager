@@ -30,3 +30,10 @@ export function importFromDiscogs(discogsReleaseId) {
 		method: "POST",
 	});
 }
+
+export function updateCollectionItem(collectionItemId, patch) {
+	return httpClient.request(`/collection-items/${collectionItemId}`, {
+		method: "PATCH",
+		body: patch,
+	});
+}

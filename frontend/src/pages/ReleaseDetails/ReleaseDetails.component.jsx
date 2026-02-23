@@ -8,6 +8,7 @@ import {
 	CircularProgress,
 	Divider,
 	FormControl,
+	IconButton,
 	InputLabel,
 	LinearProgress,
 	List,
@@ -16,10 +17,12 @@ import {
 	MenuItem,
 	Select,
 	Stack,
+	Tooltip,
 	Typography,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { ArrowBack } from "@mui/icons-material";
+import { ArrowBack, Edit } from "@mui/icons-material";
+import EditCollectionItemDialogView from "./EditCollectionItemDialog.component.jsx";
 
 export default function ReleaseDetailsView({
 	loading,
@@ -28,6 +31,8 @@ export default function ReleaseDetailsView({
 	savingByItemId = {},
 	saveErrorByItemId = {},
 	onChangeCollectionItemStatus,
+	onEditCollectionItem,
+	editDialog,
 }) {
 	const navigate = useNavigate();
 
@@ -156,6 +161,18 @@ export default function ReleaseDetailsView({
 															<MenuItem value="traded">traded</MenuItem>
 														</Select>
 													</FormControl>
+													<Tooltip title="Edit">
+														<span>
+															<IconButton
+																aria-label={`Edit collection item ${ci.id}`}
+																onClick={() => onEditCollectionItem?.(ci)}
+																disabled={saving}
+																size="small"
+															>
+																<Edit />
+															</IconButton>
+														</span>
+													</Tooltip>
 												</Stack>
 											</ListItem>
 										);
@@ -191,6 +208,7 @@ export default function ReleaseDetailsView({
 					)}
 				</CardContent>
 			</Card>
+			{editDialog?.open && <EditCollectionItemDialogView {...editDialog} />}
 		</Stack>
 	);
 }
