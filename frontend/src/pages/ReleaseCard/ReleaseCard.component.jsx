@@ -15,7 +15,15 @@ export default function ReleaseCard({ item }) {
 						<Typography variant="subtitle1" fontWeight={600} noWrap title={item.title}>
 							{item.title}
 						</Typography>
-
+						{item.artist ? (
+							<Typography variant="body2" color="text.secondary" noWrap title={item.artist}>
+								{item.artist}
+							</Typography>
+						) : (
+							<Typography variant="body2" color="text.secondary">
+								Unknown artist
+							</Typography>
+						)}
 						<Typography variant="body2" color="text.secondary">
 							{item.year ? item.year : "Year unknown"}
 						</Typography>

@@ -52,23 +52,34 @@ export function createCollectionItemsRouter({ db }) {
 		const rows = await all(
 			db,
 			`
-      SELECT
-        ci.id AS collectionItemId,
-        ci.status,
-        ci.media_condition AS mediaCondition,
-        ci.sleeve_condition AS sleeveCondition,
-        ci.location,
-        ci.notes,
-        r.id AS releaseId,
-        r.title,
-        r.year,
-        r.cover_image_url AS coverImageUrl
-      FROM collection_items ci
-      JOIN releases r ON r.id = ci.release_id
-      ${whereSql}
-      ORDER BY ci.created_at DESC
-      LIMIT ?
-      OFFSET ?
+				SELECT
+					ci.id AS collectionItemId,
+					ci.status,
+					ci.media_condition AS mediaCondition,
+					ci.sleeve_condition AS sleeveCondition,
+					ci.location,
+					ci.notes,
+
+					r.id AS releaseId,
+					r.title,
+					r.year,
+					r.cover_image_url AS coverImageUrl,
+
+					(
+						SELECT a.name
+						FROM release_artists ra
+						JOIN artists a ON a.id = ra.artist_id
+						WHERE ra.release_id = r.id
+						ORDER BY ra.position ASC
+						LIMIT 1
+					) AS artist
+
+				FROM collection_items ci
+				JOIN releases r ON r.id = ci.release_id
+				${whereSql}
+				ORDER BY ci.created_at DESC
+				LIMIT ?
+				OFFSET ?
       `,
 			[...params, limit, offset],
 		);
