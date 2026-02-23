@@ -1,6 +1,7 @@
 import {
 	Alert,
 	Box,
+	Button,
 	Card,
 	CardContent,
 	CardMedia,
@@ -12,8 +13,12 @@ import {
 	Stack,
 	Typography,
 } from "@mui/material";
+import { ArrowBack } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
 export default function ReleaseDetailsView({ loading, error, data }) {
+	const navigate = useNavigate();
+
 	if (loading) {
 		return (
 			<Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
@@ -26,12 +31,17 @@ export default function ReleaseDetailsView({ loading, error, data }) {
 	if (!data) return null;
 
 	const { release, artists, labels, tracks, barcodes, collectionItems } = data;
-	const cover = release.coverImageUrl || "https://via.placeholder.com/600x600?text=No+Cover";
+	const cover = release.coverImageUrl || "https://placehold.co/600/orange/green?text=No+Cover";
 
 	const artistText = artists.length ? artists.map((a) => a.name).join(", ") : "Unknown artist";
 
 	return (
 		<Stack spacing={2}>
+			<Box>
+				<Button startIcon={<ArrowBack />} onClick={() => navigate(-1)} variant="outlined">
+					Back to collection
+				</Button>
+			</Box>
 			<Typography variant="h5">{release.title}</Typography>
 			<Typography variant="body1" color="text.secondary">
 				{artistText}
@@ -120,10 +130,7 @@ export default function ReleaseDetailsView({ loading, error, data }) {
 								const primary = (t.position ? `${t.position} ` : "") + t.title;
 								return (
 									<ListItem key={t.id} disablePadding>
-										<ListItemText
-											primary={primary}
-											secondary={t.duration || undefined}
-										/>
+										<ListItemText primary={primary} secondary={t.duration || undefined} />
 									</ListItem>
 								);
 							})}
