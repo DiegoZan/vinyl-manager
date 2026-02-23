@@ -4,8 +4,6 @@ const DISCOGS_BASE_URL = "https://api.discogs.com";
 
 function requireEnv(name) {
 	const value = process.env[name];
-	console.log("name: ", name);
-	console.log("value: ", value);
 	if (!value) {
 		throw new Error(`Missing required environment variable: ${name}`);
 	}

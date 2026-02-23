@@ -11,7 +11,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename); // backend/src
 const defaultDbPath = path.resolve(__dirname, "..", "data", "vinyl.db"); // backend/data/vinyl.db
 const DATABASE_PATH = process.env.DATABASE_PATH ? path.resolve(process.env.DATABASE_PATH) : defaultDbPath;
-console.log("Using DATABASE_PATH:", DATABASE_PATH);
 async function main() {
 	const db = await initDb(DATABASE_PATH);
 
