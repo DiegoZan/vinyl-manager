@@ -1,397 +1,170 @@
-# 🎵 Vinyl Collection Manager
+﻿# Vinyl Manager
 
-## 1. Descripción del Proyecto
+Aplicacion full-stack para gestionar una coleccion de vinilos. Permite buscar en la coleccion, importar lanzamientos desde Discogs y editar el estado/metadatos de cada copia fisica.
 
-**Vinyl Collection Manager** es una aplicación web diseñada para registrar, organizar y consultar una colección personal de discos de vinilo.
+## Caracteristicas actuales
 
-La aplicación permite mantener un inventario estructurado de discos físicos, consultarlos fácilmente mediante búsquedas avanzadas, y enriquecer automáticamente la información utilizando la API pública de Discogs.
+- Listado de la coleccion con filtros por estado y busqueda libre.
+- Busqueda local por titulo, artista, track, catalogo y codigo de barras.
+- Importacion desde Discogs (por codigo de barras, artista+titulo o numero de catalogo).
+- Vista de detalle de release con artistas, sellos, tracklist, barcodes y copias asociadas.
+- Edicion de estado de copia (`active`, `sold`, `lost`, `broken`, `traded`).
+- Edicion de metadatos de copia: ubicacion, condiciones Goldmine, fecha/importe de compra, moneda y notas.
+- Tema claro/oscuro en frontend.
 
-El sistema está pensado como una herramienta personal, pero con una arquitectura lo suficientemente robusta como para escalar a múltiples usuarios si fuera necesario.
+## Stack tecnologico
 
----
+- Frontend: React 19, Vite, React Router, MUI.
+- Backend: Node.js, Express 5, SQLite3.
+- Testing: Vitest (frontend y backend) + Supertest (backend).
+- Integracion externa: Discogs API.
 
-## 2. Objetivos del Proyecto
+## Estructura del proyecto
 
-- Centralizar la información de una colección personal de vinilos.
-- Evitar duplicados involuntarios.
-- Facilitar la búsqueda rápida dentro de la colección.
-- Enriquecer automáticamente los datos mediante integración con Discogs.
-- Mantener historial de estado del disco (vendido, roto, perdido, etc.).
-- Servir como proyecto demostrativo de arquitectura moderna full-stack.
-
----
-
-## 3. Funcionalidades Principales
-
-### 📀 3.1 Gestión de Colección
-
-- Visualización de todos los discos en la colección.
-- Vista tipo grid con:
-  - Tapa principal (cover art)
-  - Artista
-  - Título
-  - Año
-  - Sello discográfico
-  - Número de catálogo
-- Vista detallada del disco con:
-  - Tracklist completa
-  - Géneros y estilos
-  - Formato (LP, EP, 7", 12", etc.)
-  - País
-  - Notas adicionales
-  - Estado del disco
-
----
-
-### 🔎 3.2 Búsqueda Avanzada
-
-Búsqueda dinámica por:
-
-- Artista
-- Título
-- Año
-- Canción (tracklist)
-- Sello
-- Número de catálogo
-- Código de barras
-
-Filtros por:
-
-- Estado (activo, vendido, perdido, roto)
-- Género
-- Año
-- Formato
-
----
-
-### ➕ 3.3 Alta de Nuevos Discos
-
-Un disco puede agregarse de dos maneras:
-
-#### 1. Manual
-
-Ingresando los datos básicos manualmente.
-
-#### 2. Automática (Integración con Discogs API)
-
-Se podrá obtener información ingresando:
-
-- Código de barras
-- Artista + título
-- Número de catálogo
-
-El sistema consultará la API de Discogs y permitirá:
-
-- Seleccionar la versión correcta
-- Importar automáticamente:
-  - Cover
-  - Tracklist
-  - Año
-  - Géneros
-  - Sello
-  - País
-  - Formato
-
----
-
-### 🗂 3.4 Estados del Disco (Soft Delete)
-
-Los discos **no se eliminan físicamente** de la base de datos.
-
-En su lugar pueden marcarse como:
-
-- Activo
-- Vendido
-- Perdido
-- Roto
-- Intercambiado
-
-Esto permite:
-
-- Mantener historial
-- Generar estadísticas
-- Restaurar discos marcados incorrectamente
-
----
-
-### 📊 3.5 Estadísticas (Funcionalidad adicional sugerida)
-
-- Total de discos
-- Distribución por género
-- Distribución por década
-- Distribución por formato
-- Sello más frecuente
-- País más frecuente
-
----
-
-### 💾 3.6 Exportación / Backup
-
-- Exportación de la colección en JSON
-- Restauración desde JSON
-- Posible futura exportación CSV
-
----
-
-### 🚀 3.7 Funcionalidades futuras (extensibles)
-
-- Etiquetas personalizadas (tags)
-- Ubicación física (estantería, caja, etc.)
-- Valor estimado
-- Modo oscuro
-- Detección de posibles duplicados
-- Soporte multiusuario
-- Dashboard de resumen
-
----
-
-## 4. Arquitectura del Sistema
-
-El sistema está compuesto por cuatro componentes principales:
-
-### 4.1 Frontend
-
-- React (Vite)
-- UI basada en Material UI
-- Comunicación con backend vía REST API
-- Renderizado de imágenes y datos estructurados
-
-El frontend es servido como contenido estático por Nginx.
-
----
-
-### 4.2 Backend
-
-- Node.js
-- Express
-- API REST
-- Integración con API externa de Discogs
-- Lógica de negocio y persistencia
-
-Responsabilidades:
-
-- CRUD de discos
-- Gestión de estados
-- Búsquedas y filtros
-- Proxy seguro hacia Discogs (oculta token)
-- Validación de datos
-
----
-
-### 4.3 Base de Datos
-
-- SQLite
-- Base de datos local en el VPS
-- Persistencia mediante archivo `vinyl.db`
-
-Ventajas:
-
-- No requiere servidor adicional
-- Simple de mantener
-- Suficiente para uso personal o pequeño grupo
-
----
-
-### 4.4 Servidor Web / Reverse Proxy
-
-- Nginx
-- Sirve archivos estáticos del frontend
-- Proxy inverso hacia `/api` → Node+Express
-- Gestión de HTTPS
-
----
-
-## 5. Diagrama de Arquitectura
-
-```mermaid
-flowchart LR
-    User[Usuario Navegador]
-
-    subgraph VPS
-        Nginx[Nginx Reverse Proxy]
-        React["Frontend React<br>(Archivos estáticos)"]
-        API[Node + Express API]
-        DB[(SQLite Database<br>vinyl.db)]
-    end
-
-    Discogs[(Discogs API)]
-
-    User -->|HTTPS| Nginx
-    Nginx -->|Static Files| React
-    Nginx -->|/api/* Proxy| API
-    API -->|SQL Queries| DB
-    API -->|REST Request| Discogs
-```
-
----
-
-## 6. Flujo básico de operación
-
-1️⃣ Visualización
-
-Usuario → React → /api/releases → SQLite → datos devueltos → render en UI.
-
-2️⃣ Alta con Discogs
-
-Usuario → React → /api/discogs/search → Backend → Discogs API → datos → React → Confirmación → /api/releases → SQLite.
-
----
-
-## 7. Estructura general del proyecto
-
-```
+```text
 vinyl-manager/
-│
-├── frontend/
-│   ├── src/
-│   └── dist/
-│
-├── backend/
-│   ├── routes/
-│   ├── controllers/
-│   ├── services/
-│   └── db/
-│
-└── nginx/
-    └── config
+|-- backend/
+|   |-- data/
+|   |   `-- vinyl.db
+|   |-- src/
+|   |   |-- db/
+|   |   |-- mappers/
+|   |   |-- routes/
+|   |   |-- services/
+|   |   |-- app.js
+|   |   `-- server.js
+|   |-- tests/
+|   `-- package.json
+|-- frontend/
+|   |-- src/
+|   |   |-- api/
+|   |   |-- components/
+|   |   |-- pages/
+|   |   |-- routes/
+|   |   `-- App.jsx
+|   |-- .env.example
+|   `-- package.json
+`-- README.md
 ```
 
----
+## Requisitos
 
-## 8. Stack tecnológico
+- Node.js 20+ (recomendado).
+- npm 10+.
 
-- React
-- Vite + Vitest
-- Material UI
-- Node.js
-- Express
-- SQLite
-- Nginx
-- Discogs API
+## Configuracion de entorno
 
----
+### Backend (`backend/.env`)
 
-## 9. Ejecutando la aplicación
+Variables usadas por el servidor:
 
-El proyecto está compuesto de dos aplicaciones separadas:
-
-- `frontend/` → React (Vite)
-- `backend/` → Node.js + Express + SQLite
-
-Cada aplicación se despliega y ejecuta independientemente.
-
-### 1️⃣ Backend
-
-#### Instalar dependencias
-
-```bash
-cd backend
-npm install
-```
-
-#### Ejecutar en modo desarrollo
-
-```bash
-npm run dev
-```
-
-El backend iniciará en `http://localhos:3000`.
-
-Endpoint de prueba: `GET /api/health`.
-
-#### Ejecutar en modo producción
-
-```bash
-npm start
-```
-
-#### Ejecutar tests
-
-```
-cd backend
-npm test
-```
-
-### 2️⃣ Frontend
-
-#### Instalar dependencias
-
-```bash
-cd frontend
-npm install
-```
-
-#### Ejecutar en modo desarrollo
-
-```bash
-npm run dev
-```
-
-La aplicación iniciará en `http://localhos:5173`.
-
-#### Ejecutar tests
-
-```
-cd frontend
-npm test
-```
-
-#### Build para producción
-
-```bash
-npm build
-```
-
----
-
-## 9. Documentación de la API
-
-El proyecto utiliza una integración con la API de Discogs.
-
-La documentación oficial está disponible en: https://www.discogs.com/developers
-
----
-
-## 10. Deployment (VPS + Nginx)
-
-Esta aplicación está diseñada para ser desplegada en un VPS utilizando Nginx como reverse proxy.
-
-### Production Architecture
-
-- Nginx serves the React static build.
-- Nginx proxies `/api` requests to the Node.js backend.
-- SQLite runs locally as a file-based database.
-- Backend runs as a Node.js process (e.g., via PM2 or systemd).
-
----
-
-## 1️⃣ Frontend
-
-```bash
-cd frontend
-npm install
-npm run build
-```
-
-El código de producción se generará en `frontend/dist`. El contenido de esta carpeta se debe copiar a la carpeta raiz de Nginx, por ejemplo en `/var/www/vinyl-manager`.
-
-## 2️⃣ Backend
-
-En el VPS:
-
-```
-cd backend
-npm install
-```
-
-Crear un archivo de entorno para producción:
-
-```
+```env
 PORT=3000
-DATABASE_PATH=/var/www/vinyl-manager/data/vinyl.db
-
-DISCOGS_KEY=your_discogs_key
-DISCOGS_SECRET=your_discogs_secret
+DATABASE_PATH=./data/vinyl.db
+DISCOGS_KEY=tu_discogs_key
+DISCOGS_SECRET=tu_discogs_secret
+DISCOGS_USER_AGENT=VinylManager/1.0 +tu_correo_o_url
 ```
 
-Iniciar el backend con `npm start`.
+Notas:
+- `DATABASE_PATH` es opcional. Si no se define, usa `backend/data/vinyl.db`.
+- `DISCOGS_*` son necesarias para endpoints de Discogs/importacion.
+
+### Frontend (`frontend/.env`)
+
+```env
+VITE_API_BASE_URL=/api
+```
+
+- En desarrollo, Vite ya trae proxy de `/api` a `http://localhost:3000`.
+- Si cambias host/puerto de backend, ajusta `VITE_API_BASE_URL` o `vite.config.js`.
+
+## Instalacion
+
+```bash
+# Backend
+cd backend
+npm install
+
+# Frontend
+cd ../frontend
+npm install
+```
+
+## Ejecucion en desarrollo
+
+Abrir dos terminales:
+
+```bash
+# Terminal 1: backend
+cd backend
+npm run dev
+```
+
+```bash
+# Terminal 2: frontend
+cd frontend
+npm run dev
+```
+
+Servicios por defecto:
+- Frontend: `http://localhost:5173`
+- Backend: `http://localhost:3000`
+- Healthcheck: `GET http://localhost:3000/api/health`
+
+## Scripts disponibles
+
+### Backend
+
+```bash
+cd backend
+npm run dev      # nodemon src/server.js
+npm start        # node src/server.js
+npm test         # vitest
+```
+
+### Frontend
+
+```bash
+cd frontend
+npm run dev      # vite
+npm run build    # build de produccion
+npm run preview  # vista previa del build
+npm run lint     # eslint
+npm test         # vitest
+```
+
+## API (resumen)
+
+### Salud
+- `GET /api/health`
+
+### Coleccion
+- `GET /api/collection-items?q=&status=&limit=&offset=`
+- `PATCH /api/collection-items/:id/status`
+- `PATCH /api/collection-items/:id`
+
+### Releases
+- `POST /api/releases/manual`
+- `POST /api/releases/import/discogs/:discogsReleaseId`
+- `GET /api/releases/:id`
+
+### Discogs (proxy backend)
+- `GET /api/discogs/search`
+- `GET /api/discogs/releases/:id`
+
+## Tests
+
+```bash
+# Backend
+cd backend
+npm test
+
+# Frontend
+cd frontend
+npm test
+```
+
+## Estado actual
+
+El proyecto esta orientado a uso local/persona y persistencia en SQLite. La importacion desde Discogs y la gestion de estados/metadata de copias ya estan implementadas y cubiertas con tests basicos en backend.
