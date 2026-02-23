@@ -7,16 +7,28 @@ import {
 	CardMedia,
 	CircularProgress,
 	Divider,
+	FormControl,
+	InputLabel,
+	LinearProgress,
 	List,
 	ListItem,
 	ListItemText,
+	MenuItem,
+	Select,
 	Stack,
 	Typography,
 } from "@mui/material";
-import { ArrowBack } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import { ArrowBack } from "@mui/icons-material";
 
-export default function ReleaseDetailsView({ loading, error, data }) {
+export default function ReleaseDetailsView({
+	loading,
+	error,
+	data,
+	savingByItemId = {},
+	saveErrorByItemId = {},
+	onChangeCollectionItemStatus,
+}) {
 	const navigate = useNavigate();
 
 	if (loading) {
@@ -93,20 +105,61 @@ export default function ReleaseDetailsView({ loading, error, data }) {
 								</Typography>
 							) : (
 								<List dense>
-									{collectionItems.map((ci) => (
-										<ListItem key={ci.id} disablePadding>
-											<ListItemText
-												primary={`#${ci.id} • ${ci.status}`}
-												secondary={[
-													ci.location ? `Location: ${ci.location}` : null,
-													ci.mediaCondition ? `Media: ${ci.mediaCondition}` : null,
-													ci.sleeveCondition ? `Sleeve: ${ci.sleeveCondition}` : null,
-												]
-													.filter(Boolean)
-													.join(" • ")}
-											/>
-										</ListItem>
-									))}
+									{collectionItems.map((ci) => {
+										const saving = Boolean(savingByItemId[ci.id]);
+										const saveError = saveErrorByItemId[ci.id];
+
+										return (
+											<ListItem key={ci.id} disablePadding sx={{ py: 1 }}>
+												<Stack
+													direction={{ xs: "column", sm: "row" }}
+													spacing={2}
+													sx={{ width: "100%" }}
+													alignItems={{ sm: "center" }}
+												>
+													<Box sx={{ flex: 1, minWidth: 0 }}>
+														<Typography variant="body2" fontWeight={600}>
+															Copy #{ci.id}
+														</Typography>
+
+														<Typography variant="body2" color="text.secondary" noWrap>
+															{[
+																ci.location ? `Location: ${ci.location}` : null,
+																ci.mediaCondition ? `Media: ${ci.mediaCondition}` : null,
+																ci.sleeveCondition ? `Sleeve: ${ci.sleeveCondition}` : null,
+															]
+																.filter(Boolean)
+																.join(" • ") || "—"}
+														</Typography>
+
+														{saveError && (
+															<Typography variant="caption" color="error">
+																{saveError}
+															</Typography>
+														)}
+
+														{saving && <LinearProgress sx={{ mt: 1 }} />}
+													</Box>
+
+													<FormControl size="small" sx={{ minWidth: 170 }} disabled={saving}>
+														<InputLabel id={`status-label-${ci.id}`}>Status</InputLabel>
+														<Select
+															labelId={`status-label-${ci.id}`}
+															value={ci.status}
+															label="Status"
+															onChange={(e) => onChangeCollectionItemStatus?.(ci.id, e.target.value)}
+														>
+															<MenuItem value="active">active</MenuItem>
+															<MenuItem value="sold">sold</MenuItem>
+															<MenuItem value="lost">lost</MenuItem>
+															<MenuItem value="broken">broken</MenuItem>
+															<MenuItem value="traded">traded</MenuItem>
+														</Select>
+													</FormControl>
+												</Stack>
+											</ListItem>
+										);
+									})}
 								</List>
 							)}
 						</Stack>
