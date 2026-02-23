@@ -209,9 +209,9 @@ flowchart LR
 
     subgraph VPS
         Nginx[Nginx Reverse Proxy]
-        React[Frontend React\n(Archivos estáticos)]
+        React["Frontend React<br>(Archivos estáticos)"]
         API[Node + Express API]
-        DB[(SQLite Database\nvinyl.db)]
+        DB[(SQLite Database<br>vinyl.db)]
     end
 
     Discogs[(Discogs API)]
