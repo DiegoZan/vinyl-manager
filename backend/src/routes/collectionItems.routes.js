@@ -116,9 +116,25 @@ export function createCollectionItemsRouter({ db }) {
 			return res.status(400).json({ error: "Invalid collection item id." });
 		}
 
+		const allowedGoldmine = new Set(["M", "NM", "VG+", "VG", "G+", "G", "F", "P"]);
+
+		function normalizeGoldmine(value) {
+			if (value == null) return null;
+			const v = String(value).trim().toUpperCase();
+			if (!v) return null;
+			return allowedGoldmine.has(v) ? v : "__INVALID__";
+		}
+
 		// Allowed fields
-		const mediaCondition = req.body?.mediaCondition == null ? null : String(req.body.mediaCondition).trim() || null;
-		const sleeveCondition = req.body?.sleeveCondition == null ? null : String(req.body.sleeveCondition).trim() || null;
+		const mediaConditionNorm = normalizeGoldmine(req.body?.mediaCondition);
+		if (mediaConditionNorm === "__INVALID__") {
+			return res.status(400).json({ error: "mediaCondition must be a valid Goldmine grade (e.g., NM, VG+, VG...)." });
+		}
+
+		const sleeveConditionNorm = normalizeGoldmine(req.body?.sleeveCondition);
+		if (sleeveConditionNorm === "__INVALID__") {
+			return res.status(400).json({ error: "sleeveCondition must be a valid Goldmine grade (e.g., NM, VG+, VG...)." });
+		}
 		const location = req.body?.location == null ? null : String(req.body.location).trim() || null;
 		const notes = req.body?.notes == null ? null : String(req.body.notes);
 
@@ -148,11 +164,11 @@ export function createCollectionItemsRouter({ db }) {
 
 		if ("mediaCondition" in (req.body || {})) {
 			fields.push("media_condition = ?");
-			params.push(mediaCondition);
+			params.push(mediaConditionNorm);
 		}
 		if ("sleeveCondition" in (req.body || {})) {
 			fields.push("sleeve_condition = ?");
-			params.push(sleeveCondition);
+			params.push(sleeveConditionNorm);
 		}
 		if ("location" in (req.body || {})) {
 			fields.push("location = ?");

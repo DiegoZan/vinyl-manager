@@ -1,6 +1,21 @@
-import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField } from "@mui/material";
+import {
+	Alert,
+	Button,
+	Dialog,
+	DialogActions,
+	DialogContent,
+	DialogTitle,
+	Stack,
+	TextField,
+	FormControl,
+	InputLabel,
+	MenuItem,
+	Select,
+} from "@mui/material";
 
 export default function EditCollectionItemDialogView({ open, onClose, onSave, saving, error, values, onChange }) {
+	const goldmineOptions = ["M", "NM", "VG+", "VG", "G+", "G", "F", "P"];
+
 	return (
 		<Dialog open={open} onClose={saving ? undefined : onClose} fullWidth maxWidth="sm">
 			<DialogTitle>Edit collection item</DialogTitle>
@@ -17,20 +32,39 @@ export default function EditCollectionItemDialogView({ open, onClose, onSave, sa
 					/>
 
 					<Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-						<TextField
-							label="Media condition"
-							value={values.mediaCondition ?? ""}
-							onChange={(e) => onChange({ mediaCondition: e.target.value })}
-							placeholder="e.g., NM, VG+, VG..."
-							fullWidth
-						/>
-						<TextField
-							label="Sleeve condition"
-							value={values.sleeveCondition ?? ""}
-							onChange={(e) => onChange({ sleeveCondition: e.target.value })}
-							placeholder="e.g., NM, VG+, VG..."
-							fullWidth
-						/>
+						<FormControl fullWidth>
+							<InputLabel id="media-condition-label">Media condition</InputLabel>
+							<Select
+								labelId="media-condition-label"
+								label="Media condition"
+								value={values.mediaCondition ?? ""}
+								onChange={(e) => onChange({ mediaCondition: e.target.value })}
+							>
+								<MenuItem value="">(not set)</MenuItem>
+								{goldmineOptions.map((g) => (
+									<MenuItem key={g} value={g}>
+										{g}
+									</MenuItem>
+								))}
+							</Select>
+						</FormControl>
+
+						<FormControl fullWidth>
+							<InputLabel id="sleeve-condition-label">Sleeve condition</InputLabel>
+							<Select
+								labelId="sleeve-condition-label"
+								label="Sleeve condition"
+								value={values.sleeveCondition ?? ""}
+								onChange={(e) => onChange({ sleeveCondition: e.target.value })}
+							>
+								<MenuItem value="">(not set)</MenuItem>
+								{goldmineOptions.map((g) => (
+									<MenuItem key={g} value={g}>
+										{g}
+									</MenuItem>
+								))}
+							</Select>
+						</FormControl>
 					</Stack>
 
 					<Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
