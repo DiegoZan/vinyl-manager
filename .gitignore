@@ -94,3 +94,9 @@ docker-compose.override.yml
 
 *.local
 *.cache
+
+# ===============================
+# Secrets
+# ===============================
+
+.env
