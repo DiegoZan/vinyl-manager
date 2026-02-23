@@ -24,3 +24,9 @@ export function updateCollectionItemStatus(collectionItemId, status) {
 		body: { status },
 	});
 }
+
+export function importFromDiscogs(discogsReleaseId) {
+	return httpClient.request(`/releases/import/discogs/${discogsReleaseId}`, {
+		method: "POST",
+	});
+}

@@ -1,10 +1,27 @@
-import { Alert, Box, CircularProgress, Grid, MenuItem, Stack, TextField, Typography } from "@mui/material";
+import { Alert, Box, CircularProgress, Grid, MenuItem, Stack, TextField, Typography, Button } from "@mui/material";
+import { Add } from "@mui/icons-material";
 import ReleaseCard from "../ReleaseCard";
+import ImportFromDiscogsDialogView from "./ImportFromDiscogsDialog.component.jsx";
 
-export default function CollectionView({ q, status, onQChange, onStatusChange, items, loading, error }) {
+export default function CollectionView({
+	q,
+	status,
+	onQChange,
+	onStatusChange,
+	items,
+	loading,
+	error,
+	onOpenImport,
+	importDialog,
+}) {
 	return (
 		<Stack spacing={2}>
-			<Typography variant="h5">My Collection</Typography>
+			<Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
+				<Typography variant="h5">My Collection</Typography>
+				<Button variant="contained" startIcon={<Add />} onClick={onOpenImport}>
+					Import from Discogs
+				</Button>
+			</Stack>
 
 			<Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
 				<TextField
@@ -29,6 +46,7 @@ export default function CollectionView({ q, status, onQChange, onStatusChange, i
 					<MenuItem value="broken">Broken</MenuItem>
 					<MenuItem value="traded">Traded</MenuItem>
 				</TextField>
+				<ImportFromDiscogsDialogView {...importDialog} />
 			</Stack>
 
 			{loading && (
