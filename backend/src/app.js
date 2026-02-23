@@ -1,13 +1,21 @@
 import express from "express";
 import cors from "cors";
 
-const app = express();
+import { createCollectionItemsRouter } from "./routes/collectionItems.routes.js";
+import { createReleasesRouter } from "./routes/releases.routes.js";
 
-app.use(cors());
-app.use(express.json());
+export function createApp({ db }) {
+	const app = express();
 
-app.get("/api/health", (req, res) => {
-	res.json({ status: "ok" });
-});
+	app.use(cors());
+	app.use(express.json());
 
-export default app;
+	app.get("/api/health", (req, res) => {
+		res.json({ status: "ok" });
+	});
+
+	app.use("/api/collection-items", createCollectionItemsRouter({ db }));
+	app.use("/api/releases", createReleasesRouter({ db }));
+
+	return app;
+}
