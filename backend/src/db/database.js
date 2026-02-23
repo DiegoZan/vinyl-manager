@@ -1,8 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import sqlite3 from "sqlite3";
 
 const sqlite = sqlite3.verbose();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename); // backend/src/db
 
 function ensureParentDirExists(filePath) {
 	const dir = path.dirname(filePath);
@@ -10,7 +14,7 @@ function ensureParentDirExists(filePath) {
 }
 
 function readSchemaSql() {
-	const schemaPath = path.resolve(process.cwd(), "src", "db", "schema.sql");
+	const schemaPath = path.join(__dirname, "schema.sql"); // ✅ always backend/src/db/schema.sql
 	return fs.readFileSync(schemaPath, "utf-8");
 }
 

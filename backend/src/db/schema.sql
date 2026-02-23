@@ -1,4 +1,3 @@
--- backend/src/db/schema.sql
 PRAGMA foreign_keys = ON;
 
 -- =========================================================
@@ -8,22 +7,21 @@ PRAGMA foreign_keys = ON;
 CREATE TABLE IF NOT EXISTS releases (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-  -- Discogs references (nullable for manual entries)
   discogs_release_id INTEGER UNIQUE,
   discogs_master_id INTEGER,
 
   title TEXT NOT NULL,
   year INTEGER,
   country TEXT,
-  format TEXT,            -- e.g., LP, EP, 7", 12"
-  genres TEXT,            -- optional: store as JSON string or comma-separated
-  styles TEXT,            -- optional: store as JSON string or comma-separated
+  format TEXT,
+  genres TEXT,
+  styles TEXT,
 
-  label_main TEXT,        -- convenience field (not normalized)
-  catno_main TEXT,        -- convenience field (not normalized)
+  label_main TEXT,
+  catno_main TEXT,
 
   cover_image_url TEXT,
-  resource_url TEXT,      -- Discogs resource URL if present
+  resource_url TEXT,
 
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -45,12 +43,12 @@ CREATE TABLE IF NOT EXISTS collection_items (
   status TEXT NOT NULL DEFAULT 'active'
     CHECK (status IN ('active', 'sold', 'lost', 'broken', 'traded')),
 
-  media_condition TEXT,   -- e.g., Mint, NM, VG+, VG, G...
+  media_condition TEXT,
   sleeve_condition TEXT,
-  purchase_date TEXT,     -- ISO date string
+  purchase_date TEXT,
   purchase_price_cents INTEGER,
-  currency TEXT,          -- e.g., EUR
-  location TEXT,          -- shelf/box reference
+  currency TEXT,
+  location TEXT,
   notes TEXT,
 
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
@@ -74,8 +72,8 @@ CREATE TABLE IF NOT EXISTS artists (
 CREATE TABLE IF NOT EXISTS release_artists (
   release_id INTEGER NOT NULL,
   artist_id INTEGER NOT NULL,
-  role TEXT,           -- e.g., Main, Featuring, Remixer (optional)
-  position INTEGER,    -- ordering
+  role TEXT,
+  position INTEGER,
 
   PRIMARY KEY (release_id, artist_id),
   FOREIGN KEY (release_id) REFERENCES releases(id) ON DELETE CASCADE,
@@ -89,33 +87,38 @@ CREATE INDEX IF NOT EXISTS idx_release_artists_release_id ON release_artists(rel
 -- Labels
 -- =========================================================
 
+CREATE TABLE IF NOT EXISTS labels (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL UNIQUE
+);
+
 CREATE TABLE IF NOT EXISTS release_labels (
   release_id INTEGER NOT NULL,
   label_id INTEGER NOT NULL,
-  catno TEXT NOT NULL DEFAULT '',  -- <-- importante: NOT NULL y default ''
-
-  position INTEGER,                -- ordering (optional)
+  catno TEXT NOT NULL DEFAULT '',
+  position INTEGER,
 
   PRIMARY KEY (release_id, label_id, catno),
   FOREIGN KEY (release_id) REFERENCES releases(id) ON DELETE CASCADE,
   FOREIGN KEY (label_id) REFERENCES labels(id) ON DELETE RESTRICT
 );
 
+CREATE INDEX IF NOT EXISTS idx_labels_name ON labels(name);
 CREATE INDEX IF NOT EXISTS idx_release_labels_release_id ON release_labels(release_id);
 CREATE INDEX IF NOT EXISTS idx_release_labels_catno ON release_labels(catno);
 
 -- =========================================================
--- Tracks (tracklist)
+-- Tracks
 -- =========================================================
 
 CREATE TABLE IF NOT EXISTS tracks (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   release_id INTEGER NOT NULL,
 
-  position TEXT,       -- e.g., A1, A2, B1, 1, 2...
+  position TEXT,
   title TEXT NOT NULL,
-  duration TEXT,       -- e.g., "3:45" (optional)
-  track_index INTEGER, -- numeric ordering (optional)
+  duration TEXT,
+  track_index INTEGER,
 
   FOREIGN KEY (release_id) REFERENCES releases(id) ON DELETE CASCADE
 );
@@ -124,7 +127,7 @@ CREATE INDEX IF NOT EXISTS idx_tracks_release_id ON tracks(release_id);
 CREATE INDEX IF NOT EXISTS idx_tracks_title ON tracks(title);
 
 -- =========================================================
--- Barcodes and identifiers
+-- Barcodes
 -- =========================================================
 
 CREATE TABLE IF NOT EXISTS barcodes (
@@ -139,7 +142,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_barcodes_release_value ON barcodes(release_
 CREATE INDEX IF NOT EXISTS idx_barcodes_value ON barcodes(value);
 
 -- =========================================================
--- Tags (per collection item)
+-- Tags
 -- =========================================================
 
 CREATE TABLE IF NOT EXISTS tags (
@@ -159,7 +162,7 @@ CREATE TABLE IF NOT EXISTS collection_item_tags (
 CREATE INDEX IF NOT EXISTS idx_tags_name ON tags(name);
 
 -- =========================================================
--- Triggers for updated_at
+-- updated_at triggers
 -- =========================================================
 
 CREATE TRIGGER IF NOT EXISTS trg_releases_updated_at

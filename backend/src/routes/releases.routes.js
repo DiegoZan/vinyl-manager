@@ -1,5 +1,8 @@
 import { Router } from "express";
 import { run, get } from "../db/database.js";
+import { getRelease } from "../services/discogs.service.js";
+import { mapDiscogsReleaseToEntities } from "../mappers/discogsRelease.mapper.js";
+import { importDiscogsRelease } from "../services/discogsImport.service.js";
 
 export function createReleasesRouter({ db }) {
 	const router = Router();
@@ -54,6 +57,35 @@ export function createReleasesRouter({ db }) {
 		);
 
 		res.status(201).json(created);
+	});
+
+	// POST /api/releases/import/discogs/:discogsReleaseId
+	router.post("/import/discogs/:discogsReleaseId", async (req, res) => {
+		try {
+			const discogsReleaseId = Number(req.params.discogsReleaseId);
+			if (!Number.isInteger(discogsReleaseId) || discogsReleaseId <= 0) {
+				return res.status(400).json({ error: "Invalid discogsReleaseId." });
+			}
+
+			const discogsResponse = await getRelease(discogsReleaseId);
+			const mapped = mapDiscogsReleaseToEntities(discogsResponse.data);
+
+			const result = await importDiscogsRelease(db, mapped);
+
+			// Return a compact response for the frontend
+			return res.status(201).json({
+				ok: true,
+				discogsReleaseId,
+				releaseId: result.releaseId,
+				collectionItemId: result.collectionItemId,
+			});
+		} catch (err) {
+			const status = err.status || 500;
+			return res.status(status).json({
+				error: err.message || "Discogs import failed.",
+				discogs: err.discogs ?? null,
+			});
+		}
 	});
 
 	return router;
